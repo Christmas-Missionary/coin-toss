@@ -1,3 +1,7 @@
+/*
+Copyright (c) 2025 Christmas_Missionary - BSD Zero Clause License
+*/
+
 .global _start
 .align 4
 
