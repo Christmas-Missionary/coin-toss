@@ -22,7 +22,7 @@ argv_one_to_val:
     b.eq single_calc
   sub w20, w20, #48
   cmp w20, #9
-    cset x13, le
+    cset x13, ls
     cmp x13, xzr
       b.eq single_calc
   
@@ -51,18 +51,16 @@ get_out: // to avoid `abort`
 	svc 0
 
 _start: 
-// get number from 0-99 from argv[1]
+// get number from 1-99 from argv[1]
   cmp x0, #1
     b.gt argv_one_to_val
     b.le mov_one
-  cmp x1, xzr
-    b.eq sys_exit
 
 read_bytes:
   cmp x1, xzr
-    b.eq sys_exit
+    b.eq mov_one
   cmp x1, #99
-    b.hi sys_exit
+    b.hi mov_one
   mov x15, x1 // 1-99 in x15 for now
 
 // open /dev/urandom
