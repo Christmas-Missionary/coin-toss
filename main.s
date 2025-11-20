@@ -6,19 +6,19 @@ Copyright (c) 2025 Christmas_Missionary - BSD Zero Clause License
 .align 4
 
 argv_one_to_val:
-  add x1, x1, #8    // argv -> argv + 1
-  ldr x1, [x1]      // argv[1]
+  add x1, x1, #8             // argv -> argv + 1
+  ldr x1, [x1]               // argv[1]
 
-  ldrb w19, [x1]     // argv[1][0]
-  sub w19, w19, #48 // '0' and '9' -> 0 and 9
+  ldrb w19, [x1]             // argv[1][0]
+  sub w19, w19, #48          // '0' and '9' -> 0 and 9
   cmp w19, #9
     cset x13, ls
-    cmp x13, xzr    // bool x10 = (x9 >= 0 && x9 <= 9);
-      b.eq mov_one  // if (x10 == 0) {goto mov_one;}
+    cmp x13, xzr             // bool x10 = (x9 >= 0 && x9 <= 9);
+      b.eq mov_one           // if (x10 == 0) {goto mov_one;}
 
-  add x1, x1, #1    // argv[1] + 1
-  ldrb w20, [x1]     // argv[1][1]
-  cmp w20, wzr      // if null byte, go to single_calc
+  add x1, x1, #1             // argv[1] + 1
+  ldrb w20, [x1]             // argv[1][1]
+  cmp w20, wzr               // if null byte, go to single_calc
     b.eq single_calc
   sub w20, w20, #48
   cmp w20, #9
@@ -40,7 +40,8 @@ close_then_get_out:
   mov x0, x9
   mov x16, #6                // sys_close
   svc 0
-get_out: // to avoid `abort`
+get_out:
+// to avoid `abort`
   mov x0, #1
   adr	x1, nothing
   mov	x2, #19
@@ -72,15 +73,15 @@ read_bytes:
   cmp x0, #2                 // ENOENT
     b.eq get_out
 
-// read from /dev/urandom
-  sub sp, sp, #16 // 0-99
+// read 16 bytes from /dev/urandom
+  sub sp, sp, #16
   mov x9, x0                 // Save file id
   mov x1, sp                      
   mov x2, #16
   mov x16, #3                // sys_read
   svc 0
   cmp x0, xzr
-    b.eq close_then_get_out   // if no bytes read
+    b.eq close_then_get_out  // if no bytes read
   
 // close /dev/urandom
   mov x0, x9
@@ -95,10 +96,10 @@ read_bytes:
   ldp x20, x21, [sp]
   add sp, sp, #16
   
-  mov	x2, #6
+  mov	x2, #6                 // 6 bytes long for both strings
 	mov x16, #4                // sys_write
 
-  // x15 is size, x19 is i, x20 is big, x21 is little, x22 and x23 are temps
+// x15 is size, x19 is i, x20 is big, x21 is little, x22 and x23 are temps
 loop_writes:
   and x23, x21, #1
   lsr x21, x21, #1
@@ -109,11 +110,11 @@ loop_writes:
 // write either heads or tails
   cmp x23, xzr
     csel x1, x10, x11, eq
-  mov x0, #1
+  mov x0, #1                 // reset x0 after each sys_write
 	svc 0
 
-  add x19, x19, #1
-  cmp x19, x15
+  add x19, x19, #1           // i++
+  cmp x19, x15               // (i <= x15)
     b.lt loop_writes
 
 sys_exit:
